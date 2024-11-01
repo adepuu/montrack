@@ -1,8 +1,10 @@
 package com.adepuu.montrack.infrastructure.users.gateway;
 
+import com.adepuu.montrack.common.exceptions.DuplicateEmailException;
 import com.adepuu.montrack.entity.Users;
 import com.adepuu.montrack.infrastructure.users.mapper.UserRowMapper;
 import com.adepuu.montrack.infrastructure.users.repository.UsersRepository;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,14 +57,19 @@ public class UsersDatabaseGateway implements UsersRepository {
     return null;
   }
 
+  @Override
   @Transactional
   public void bulkInsert(List<Users> entities) {
-    String sql = "INSERT INTO users (email, password, pin, profile_picture_url) VALUES (?, ?, ?, ?)";
-    jdbcTemplate.batchUpdate(sql, entities, entities.size(), ((ps, argument) -> {
-      ps.setString(1, argument.getEmail());
-      ps.setString(2, argument.getPassword());
-      ps.setString(3, argument.getPin());
-      ps.setString(4, argument.getProfilePictureUrl());
-    }));
+    try {
+      String sql = "INSERT INTO users (email, password, pin, profile_picture_url) VALUES (?, ?, ?, ?)";
+      jdbcTemplate.batchUpdate(sql, entities, entities.size(), ((ps, argument) -> {
+        ps.setString(1, argument.getEmail());
+        ps.setString(2, argument.getPassword());
+        ps.setString(3, argument.getPin());
+        ps.setString(4, argument.getProfilePictureUrl());
+      }));
+    } catch (DataAccessException e) {
+      throw new DuplicateEmailException("Bulk insert failed: duplicate email");
+    }
   }
 }
