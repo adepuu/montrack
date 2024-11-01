@@ -5,12 +5,9 @@ import com.adepuu.montrack.infrastructure.users.dto.BulkCreateUserRequestDTO;
 import com.adepuu.montrack.infrastructure.users.dto.CreateUserRequestDTO;
 import com.adepuu.montrack.infrastructure.users.gateway.UsersDatabaseGateway;
 import com.adepuu.montrack.usecase.user.CreateUserUsecase;
-import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CreateUserUsecaseImpl implements CreateUserUsecase {

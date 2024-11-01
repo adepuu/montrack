@@ -3,13 +3,10 @@ package com.adepuu.montrack.infrastructure.users.controller;
 import com.adepuu.montrack.common.response.ApiResponse;
 import com.adepuu.montrack.infrastructure.users.dto.BulkCreateUserRequestDTO;
 import com.adepuu.montrack.infrastructure.users.dto.CreateUserRequestDTO;
-import com.adepuu.montrack.infrastructure.users.repository.UsersRepository;
 import com.adepuu.montrack.usecase.user.CreateUserUsecase;
 import com.adepuu.montrack.usecase.user.GetUsersUseCase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")

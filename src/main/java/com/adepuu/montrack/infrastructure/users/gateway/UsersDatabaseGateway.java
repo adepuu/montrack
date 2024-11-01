@@ -3,14 +3,10 @@ package com.adepuu.montrack.infrastructure.users.gateway;
 import com.adepuu.montrack.entity.Users;
 import com.adepuu.montrack.infrastructure.users.mapper.UserRowMapper;
 import com.adepuu.montrack.infrastructure.users.repository.UsersRepository;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 
 @Repository
