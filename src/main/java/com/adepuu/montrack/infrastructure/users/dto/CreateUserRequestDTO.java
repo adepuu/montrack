@@ -1,6 +1,6 @@
 package com.adepuu.montrack.infrastructure.users.dto;
 
-import com.adepuu.montrack.entity.Users;
+import com.adepuu.montrack.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,12 +14,13 @@ public class CreateUserRequestDTO {
   private String pin;
   private String profilePictureUrl;
 
-  public Users toEntity() {
-    Users user = new Users();
+  public User toEntity() {
+    User user = new User();
     user.setEmail(email);
     user.setPassword(password);
     user.setPin(pin);
     user.setProfilePictureUrl(profilePictureUrl);
+    user.setIsOnboardingFinished(false);
     return user;
   }
 }
