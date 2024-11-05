@@ -5,22 +5,16 @@ import com.adepuu.montrack.infrastructure.users.dto.BulkCreateUserRequestDTO;
 import com.adepuu.montrack.infrastructure.users.dto.CreateUserRequestDTO;
 import com.adepuu.montrack.infrastructure.users.repository.UsersRepository;
 import com.adepuu.montrack.usecase.user.CreateUserUsecase;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Validator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class CreateUserUsecaseImpl implements CreateUserUsecase {
   private final UsersRepository usersRepository;
-  private Validator validator;
 
-  public CreateUserUsecaseImpl(UsersRepository usersRepository, Validator validator) {
-    this.validator = validator;
+  public CreateUserUsecaseImpl(UsersRepository usersRepository) {
     this.usersRepository = usersRepository;
   }
 
@@ -42,16 +36,5 @@ public class CreateUserUsecaseImpl implements CreateUserUsecase {
     List<User> usersList = req.getUsers().stream().map(CreateUserRequestDTO::toEntity).toList();
     usersRepository.saveAll(usersList);
     return usersList;
-  }
-
-  private void validateUser(User user) {
-    Set<ConstraintViolation<User>> violations = validator.validate(user);
-    if (!violations.isEmpty()) {
-      StringBuilder sb = new StringBuilder();
-      for (ConstraintViolation<User> violation : violations) {
-        sb.append(violation.getPropertyPath()).append(violation.getMessage()).append(", ");
-      }
-      throw new ConstraintViolationException(sb.toString(), violations);
-    }
   }
 }
