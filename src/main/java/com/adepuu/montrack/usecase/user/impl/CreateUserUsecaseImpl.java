@@ -7,7 +7,6 @@ import com.adepuu.montrack.infrastructure.users.repository.UsersRepository;
 import com.adepuu.montrack.usecase.user.CreateUserUsecase;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
