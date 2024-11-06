@@ -16,6 +16,7 @@ import java.util.Collection;
 @AllArgsConstructor
 public class UserAuth implements UserDetails {
   private User user;
+
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     var authorities = new ArrayList<GrantedAuthority>();
@@ -36,21 +37,21 @@ public class UserAuth implements UserDetails {
 
   @Override
   public boolean isAccountNonExpired() {
-    return true;
+    return UserDetails.super.isAccountNonExpired();
   }
 
   @Override
   public boolean isAccountNonLocked() {
-    return true;
+    return UserDetails.super.isAccountNonLocked();
   }
 
   @Override
   public boolean isCredentialsNonExpired() {
-    return true;
+    return UserDetails.super.isCredentialsNonExpired();
   }
 
   @Override
   public boolean isEnabled() {
-    return true;
+    return UserDetails.super.isEnabled();
   }
 }

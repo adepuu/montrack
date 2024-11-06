@@ -57,9 +57,12 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .cors(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
+                    //  Define public routes
                     .requestMatchers("/error/**").permitAll()
                     .requestMatchers("/api/v1/auth/login").permitAll()
                     .requestMatchers("/api/v1/users/register").permitAll()
+
+                    //  Define rest of the routes to be private
                     .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
