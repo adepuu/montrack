@@ -4,6 +4,8 @@ import com.adepuu.montrack.common.exceptions.DataNotFoundException;
 import com.adepuu.montrack.entity.User;
 import com.adepuu.montrack.infrastructure.users.repository.UsersRepository;
 import com.adepuu.montrack.usecase.user.GetUsersUseCase;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

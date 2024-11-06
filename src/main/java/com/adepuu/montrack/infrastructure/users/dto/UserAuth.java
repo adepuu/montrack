@@ -20,7 +20,7 @@ public class UserAuth implements UserDetails {
   public Collection<? extends GrantedAuthority> getAuthorities() {
     var authorities = new ArrayList<GrantedAuthority>();
 
-    this.user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role)));
+    this.user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
     return authorities;
   }
 

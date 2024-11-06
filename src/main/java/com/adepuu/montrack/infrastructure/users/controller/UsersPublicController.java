@@ -1,12 +1,13 @@
 package com.adepuu.montrack.infrastructure.users.controller;
 
 import com.adepuu.montrack.common.response.ApiResponse;
+import com.adepuu.montrack.infrastructure.security.Claims;
 import com.adepuu.montrack.infrastructure.users.dto.BulkCreateUserRequestDTO;
 import com.adepuu.montrack.infrastructure.users.dto.CreateUserRequestDTO;
 import com.adepuu.montrack.usecase.user.CreateUserUsecase;
 import com.adepuu.montrack.usecase.user.GetUsersUseCase;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,6 +21,7 @@ public class UsersPublicController {
     this.createUserUsecase = createUserUsecase;
   }
 
+  @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
   @GetMapping
   public ResponseEntity<?> getUsers() {
     return ApiResponse.successfulResponse("Get all users success", getUsersUseCase.getAllUsers());
