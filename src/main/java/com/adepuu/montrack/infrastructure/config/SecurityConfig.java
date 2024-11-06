@@ -5,9 +5,9 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import jakarta.servlet.http.Cookie;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -66,8 +66,27 @@ public class SecurityConfig {
                     .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .oauth2ResourceServer(oauth2 -> oauth2
-                    .jwt(jwt -> jwt.decoder(jwtDecoder()))
+            .oauth2ResourceServer(oauth2 -> {
+                oauth2.jwt(jwt -> jwt.decoder(jwtDecoder()));
+                oauth2.bearerTokenResolver(request -> {
+                  Cookie[] cookies = request.getCookies();
+                  if (cookies != null) {
+                    for (Cookie cookie : cookies) {
+                      if (cookie.getName().equals("SID")) {
+                        return cookie.getValue();
+                      }
+                    }
+                  }
+
+                  // Get from headers instead of cookies
+                  var header = request.getHeader("Authorization");
+                  if (header != null) {
+                    return header.replace("Bearer ", "");
+                  }
+
+                  return null;
+                });
+              }
             )
             .userDetailsService(getUserAuthDetailsUsecase)
             .build();

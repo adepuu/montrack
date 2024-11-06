@@ -25,8 +25,11 @@ public class TokenService {
   public String generateToken(Authentication authentication) {
     Instant now = Instant.now();
     long expiry = 36000L;
+
     String email = authentication.getName();
+
     User user = usersRepository.findByEmailContainsIgnoreCase(email).orElseThrow(() -> new DataNotFoundException("User not found"));
+
     String scope = authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
             .reduce((a, b) -> a + " " + b)
