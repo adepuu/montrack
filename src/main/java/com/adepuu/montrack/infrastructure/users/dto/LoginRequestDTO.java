@@ -11,6 +11,5 @@ public class LoginRequestDTO {
   private String email;
 
   @NotNull
-  @Size(max = 50)
   private String password;
 }

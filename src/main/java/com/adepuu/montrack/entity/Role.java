@@ -40,8 +40,4 @@ public class Role {
 
   @Column(name = "deleted_at")
   private OffsetDateTime deletedAt;
-
-  @JsonIgnore
-  @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-  private Set<User> users = new HashSet<>();
 }

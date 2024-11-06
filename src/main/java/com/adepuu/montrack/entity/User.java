@@ -27,7 +27,6 @@ public class User {
   @Column(name = "email", nullable = false, length = 50)
   private String email;
 
-  @Size(max = 50)
   @NotNull
   @Column(name = "password", nullable = false, length = 50)
   private String password;
@@ -59,7 +58,7 @@ public class User {
   @Column(name = "deleted_at")
   private OffsetDateTime deletedAt;
 
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<Role> roles = new HashSet<>();
 

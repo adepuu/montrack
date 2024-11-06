@@ -1,8 +1,8 @@
 package com.adepuu.montrack.usecase.auth;
 
-import com.adepuu.montrack.entity.User;
 import com.adepuu.montrack.infrastructure.users.dto.LoginRequestDTO;
+import com.adepuu.montrack.infrastructure.users.dto.LoginResponseDTO;
 
 public interface LoginUsecase {
-  User authenticateUser(LoginRequestDTO req);
+  LoginResponseDTO authenticateUser(LoginRequestDTO req);
 }

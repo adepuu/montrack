@@ -1,7 +1,7 @@
 create table users (
     user_id bigserial constraint users_pk primary key,
     email varchar(50) not null constraint users_email_unique unique,
-    password varchar(50) not null,
+    password text not null,
     pin varchar(50) not null,
     profile_picture_url varchar(100),
     is_onboarding_finished boolean default false not null,

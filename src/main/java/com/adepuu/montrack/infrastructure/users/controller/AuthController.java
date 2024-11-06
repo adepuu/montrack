@@ -19,7 +19,7 @@ public class AuthController {
     this.loginUsecase = loginUsecase;
   }
 
-  @PostMapping
+  @PostMapping("/login")
   public ResponseEntity<?> login(@Validated  @RequestBody LoginRequestDTO req) {
     return ApiResponse.successfulResponse("Login successful", loginUsecase.authenticateUser(req));
   }
