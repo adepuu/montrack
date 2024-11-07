@@ -5,6 +5,7 @@ import com.adepuu.montrack.entity.User;
 import com.adepuu.montrack.infrastructure.users.repository.UsersRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -44,6 +45,11 @@ public class TokenService {
             .claim("userId", user.getId())
             .build();
 
+    // If you want to use shared secret, use line below
+//    JwsHeader jwsHeader = JwsHeader.with(() -> "HS256").build();
+//    return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+
+    // If you want to use RSA Key Pair, use line below
     return this.jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
   }
 }

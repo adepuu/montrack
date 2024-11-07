@@ -5,6 +5,7 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import jakarta.servlet.http.Cookie;
@@ -22,6 +23,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.web.SecurityFilterChain;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 // import javax.crypto.SecretKey;
 // import javax.crypto.spec.SecretKeySpec;
@@ -41,6 +45,8 @@ public class SecurityConfig {
     this.jwtConfigProperties = jwtConfigProperties;
     this.passwordEncoder = passwordEncoder;
     this.rsaKeyConfigProperties = rsaKeyConfigProperties;
+
+    log.info("Secret: " + jwtConfigProperties.getSecret());
   }
 
   @Bean
@@ -94,14 +100,15 @@ public class SecurityConfig {
 
 //  @Bean
 //  public JwtDecoder jwtDecoder() {
-//      SecretKey secretKey = new SecretKeySpec(jwtConfigProperties.getSecret().getBytes(), "HmacSHA256");
-//      return NimbusJwtDecoder.withSecretKey(secretKey).build();
+//    SecretKey originalKey = new SecretKeySpec(jwtConfigProperties.getSecret().getBytes(), "HmacSHA256");
+//    return NimbusJwtDecoder.withSecretKey(originalKey).build();
 //  }
 //
 //  @Bean
 //  public JwtEncoder jwtEncoder() {
-//      SecretKey secretKey = new SecretKeySpec(jwtConfigProperties.getSecret().getBytes(), "HmacSHA256");
-//      return new NimbusJwtEncoder(new ImmutableSecret<>(secretKey));
+//      SecretKey key = new SecretKeySpec(jwtConfigProperties.getSecret().getBytes(), "HmacSHA256");
+//    JWKSource<SecurityContext> immutableSecret = new ImmutableSecret<SecurityContext>(key);
+//    return new NimbusJwtEncoder(immutableSecret);
 //  }
 
   @Bean
