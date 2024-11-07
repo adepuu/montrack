@@ -7,17 +7,13 @@ import com.adepuu.montrack.infrastructure.users.dto.CreateUserRequestDTO;
 import com.adepuu.montrack.infrastructure.users.repository.RoleRepository;
 import com.adepuu.montrack.infrastructure.users.repository.UsersRepository;
 import com.adepuu.montrack.usecase.user.CreateUserUsecase;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.java.Log;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Log
 @Service
@@ -41,15 +37,9 @@ public class CreateUserUsecaseImpl implements CreateUserUsecase {
     if (defaultRole.isPresent()) {
         newUser.getRoles().add(defaultRole.get());
     } else {
-        throw new RuntimeException("Default role not found");
+      throw new RuntimeException("Default role not found");
     }
-
-    try {
-      usersRepository.save(newUser);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return newUser;
+    return usersRepository.save(newUser);
   }
 
   @Override
