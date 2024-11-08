@@ -1,10 +1,7 @@
 package com.adepuu.montrack.infrastructure.config;
 
+import com.adepuu.montrack.infrastructure.security.filters.TokenBlacklist;
 import com.adepuu.montrack.usecase.auth.GetUserAuthDetailsUsecase;
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
@@ -22,13 +19,12 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
-// import javax.crypto.SecretKey;
-// import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableWebSecurity
@@ -38,15 +34,17 @@ public class SecurityConfig {
   private final GetUserAuthDetailsUsecase getUserAuthDetailsUsecase;
   private final JwtConfigProperties jwtConfigProperties;
   private final PasswordEncoder passwordEncoder;
-  private final RsaKeyConfigProperties rsaKeyConfigProperties;
+  private final TokenBlacklist tokenBlacklistFilter;
 
-  public SecurityConfig(GetUserAuthDetailsUsecase getUserAuthDetailsUsecase, JwtConfigProperties jwtConfigProperties, PasswordEncoder passwordEncoder, RsaKeyConfigProperties rsaKeyConfigProperties) {
+  public SecurityConfig(
+      GetUserAuthDetailsUsecase getUserAuthDetailsUsecase,
+      JwtConfigProperties jwtConfigProperties,
+      PasswordEncoder passwordEncoder,
+      TokenBlacklist tokenBlacklistFilter) {
     this.getUserAuthDetailsUsecase = getUserAuthDetailsUsecase;
     this.jwtConfigProperties = jwtConfigProperties;
     this.passwordEncoder = passwordEncoder;
-    this.rsaKeyConfigProperties = rsaKeyConfigProperties;
-
-    log.info("Secret: " + jwtConfigProperties.getSecret());
+    this.tokenBlacklistFilter = tokenBlacklistFilter;
   }
 
   @Bean
@@ -60,66 +58,53 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http
-            .csrf(AbstractHttpConfigurer::disable)
-            .cors(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth
-                    //  Define public routes
-                    .requestMatchers("/error/**").permitAll()
-                    .requestMatchers("/api/v1/auth/login").permitAll()
-                    .requestMatchers("/api/v1/users/register").permitAll()
+        .csrf(AbstractHttpConfigurer::disable)
+        .cors(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(auth -> auth
+            // Define public routes
+            .requestMatchers("/error/**").permitAll()
+            .requestMatchers("/api/v1/auth/login").permitAll()
+            .requestMatchers("/api/v1/users/register").permitAll()
 
-                    //  Define rest of the routes to be private
-                    .anyRequest().authenticated()
-            )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .oauth2ResourceServer(oauth2 -> {
-                oauth2.jwt(jwt -> jwt.decoder(jwtDecoder()));
-                oauth2.bearerTokenResolver(request -> {
-                  Cookie[] cookies = request.getCookies();
-                  if (cookies != null) {
-                    for (Cookie cookie : cookies) {
-                      if (cookie.getName().equals("SID")) {
-                        return cookie.getValue();
-                      }
-                    }
-                  }
-
-                  // Get from headers instead of cookies
-                  var header = request.getHeader("Authorization");
-                  if (header != null) {
-                    return header.replace("Bearer ", "");
-                  }
-
-                  return null;
-                });
+            // Define rest of the routes to be private
+            .anyRequest().authenticated())
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .oauth2ResourceServer(oauth2 -> {
+          oauth2.jwt(jwt -> jwt.decoder(jwtDecoder()));
+          oauth2.bearerTokenResolver(request -> {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+              for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("SID")) {
+                  return cookie.getValue();
+                }
               }
-            )
-            .userDetailsService(getUserAuthDetailsUsecase)
-            .build();
-  }
+            }
 
-//  @Bean
-//  public JwtDecoder jwtDecoder() {
-//    SecretKey originalKey = new SecretKeySpec(jwtConfigProperties.getSecret().getBytes(), "HmacSHA256");
-//    return NimbusJwtDecoder.withSecretKey(originalKey).build();
-//  }
-//
-//  @Bean
-//  public JwtEncoder jwtEncoder() {
-//      SecretKey key = new SecretKeySpec(jwtConfigProperties.getSecret().getBytes(), "HmacSHA256");
-//    JWKSource<SecurityContext> immutableSecret = new ImmutableSecret<SecurityContext>(key);
-//    return new NimbusJwtEncoder(immutableSecret);
-//  }
+            // Get from headers instead of cookies
+            var header = request.getHeader("Authorization");
+            if (header != null) {
+              return header.replace("Bearer ", "");
+            }
+
+            return null;
+          });
+        })
+        .addFilterAfter(tokenBlacklistFilter, BearerTokenAuthenticationFilter.class)
+        .userDetailsService(getUserAuthDetailsUsecase)
+        .build();
+  }
 
   @Bean
   public JwtDecoder jwtDecoder() {
-    return NimbusJwtDecoder.withPublicKey(rsaKeyConfigProperties.publicKey()).build();
+    SecretKey originalKey = new SecretKeySpec(jwtConfigProperties.getSecret().getBytes(), "HmacSHA256");
+    return NimbusJwtDecoder.withSecretKey(originalKey).build();
   }
 
   @Bean
-  JwtEncoder jwtEncoder() {
-    JWK jwk = new RSAKey.Builder(rsaKeyConfigProperties.publicKey()).privateKey(rsaKeyConfigProperties.privateKey()).build();
-    JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
-    return new NimbusJwtEncoder(jwks);
+  public JwtEncoder jwtEncoder() {
+    SecretKey key = new SecretKeySpec(jwtConfigProperties.getSecret().getBytes(), "HmacSHA256");
+    JWKSource<SecurityContext> immutableSecret = new ImmutableSecret<SecurityContext>(key);
+    return new NimbusJwtEncoder(immutableSecret);
   }
 }

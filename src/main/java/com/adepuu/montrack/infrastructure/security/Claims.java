@@ -21,13 +21,26 @@ public class Claims {
       throw new IllegalStateException("JWT not found in SecurityContext");
     }
 
-    log.info(authentication.toString());
-
     return jwt.getClaims();
   }
 
   public static String getEmailFromJwt() {
-    return (String) getClaimsFromJwt().get("sub"); // Assuming 'sub' is the email
+    return (String) getClaimsFromJwt().get("sub");
+  }
+
+  public static String getJwtExpirationDate() {
+    return getClaimsFromJwt().get("exp").toString();
+  }
+
+  public static String getJwtTokeString() {
+    SecurityContext context = SecurityContextHolder.getContext();
+    Authentication authentication = context.getAuthentication();
+
+    if (authentication == null || !(authentication.getPrincipal() instanceof Jwt jwt)) {
+      throw new IllegalStateException("JWT not found in SecurityContext");
+    }
+
+    return jwt.getTokenValue();
   }
 
   public static String getRoleFromJwt() {
@@ -36,9 +49,9 @@ public class Claims {
       return (String) roles;
     } else if (roles instanceof Collection) {
       return ((Collection<?>) roles).stream()
-              .map(Object::toString)
-              .findFirst()
-              .orElse(null);
+          .map(Object::toString)
+          .findFirst()
+          .orElse(null);
     }
     return null;
   }

@@ -1,6 +1,7 @@
-package com.adepuu.montrack.infrastructure.security;
+package com.adepuu.montrack.usecase.auth.impl;
 
 import com.adepuu.montrack.common.exceptions.DataNotFoundException;
+import com.adepuu.montrack.usecase.auth.TokenGenerationUsecase;
 import com.adepuu.montrack.entity.User;
 import com.adepuu.montrack.infrastructure.users.repository.UsersRepository;
 import org.springframework.security.core.Authentication;
@@ -14,42 +15,40 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 
 @Service
-public class TokenService {
+public class TokenGenerationUsecaseImpl implements TokenGenerationUsecase {
   private final JwtEncoder jwtEncoder;
   private final UsersRepository usersRepository;
 
-  public TokenService(JwtEncoder jwtEncoder, UsersRepository usersRepository) {
+  public TokenGenerationUsecaseImpl(JwtEncoder jwtEncoder, UsersRepository usersRepository) {
     this.jwtEncoder = jwtEncoder;
     this.usersRepository = usersRepository;
   }
 
   public String generateToken(Authentication authentication) {
     Instant now = Instant.now();
+    
+    // 10 hours
     long expiry = 36000L;
 
     String email = authentication.getName();
 
-    User user = usersRepository.findByEmailContainsIgnoreCase(email).orElseThrow(() -> new DataNotFoundException("User not found"));
+    User user = usersRepository.findByEmailContainsIgnoreCase(email)
+        .orElseThrow(() -> new DataNotFoundException("User not found"));
 
     String scope = authentication.getAuthorities().stream()
-            .map(GrantedAuthority::getAuthority)
-            .reduce((a, b) -> a + " " + b)
-            .orElse("");
+        .map(GrantedAuthority::getAuthority)
+        .reduce((a, b) -> a + " " + b)
+        .orElse("");
 
     JwtClaimsSet claims = JwtClaimsSet.builder()
-            .issuer("self")
-            .issuedAt(now)
-            .expiresAt(now.plusSeconds(expiry))
-            .subject(email)
-            .claim("scope", scope)
-            .claim("userId", user.getId())
-            .build();
+        .issuedAt(now)
+        .expiresAt(now.plusSeconds(expiry))
+        .subject(email)
+        .claim("scope", scope)
+        .claim("userId", user.getId())
+        .build();
 
-    // If you want to use shared secret, use line below
-//    JwsHeader jwsHeader = JwsHeader.with(() -> "HS256").build();
-//    return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
-
-    // If you want to use RSA Key Pair, use line below
-    return this.jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    JwsHeader jwsHeader = JwsHeader.with(() -> "HS256").build();
+    return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
   }
 }
