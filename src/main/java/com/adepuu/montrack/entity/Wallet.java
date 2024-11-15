@@ -9,6 +9,8 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -58,5 +60,14 @@ public class Wallet {
 
   @Column(name = "deleted_at")
   private OffsetDateTime deletedAt;
+
+  @OneToMany(mappedBy = "wallet")
+  private Set<Goal> goals = new LinkedHashSet<>();
+
+  @OneToMany(mappedBy = "wallet")
+  private Set<Pocket> pockets = new LinkedHashSet<>();
+
+  @OneToMany(mappedBy = "wallet")
+  private Set<Trx> trxes = new LinkedHashSet<>();
 
 }

@@ -1,5 +1,9 @@
 package com.adepuu.montrack.infrastructure.users.dto;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import com.adepuu.montrack.entity.Role;
 import com.adepuu.montrack.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +25,8 @@ public class CreateUserRequestDTO {
     user.setPin(pin);
     user.setProfilePictureUrl(profilePictureUrl);
     user.setIsOnboardingFinished(false);
+    Set<Role> roles = new HashSet<>();
+    user.setRoles(roles);
     return user;
   }
 }

@@ -1,0 +1,130 @@
+{
+	"info": {
+		"_postman_id": "f96e552c-35e3-463c-9e3d-a5903070dff6",
+		"name": "Money Tracker APP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4925962"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoibW9jaWVlQG1haWwuY29tIiwiZXhwIjoxNzMwODk5NjQ5LCJpYXQiOjE3MzA4NjM2NDksInNjb3BlIjoiUk9MRV9jb20uYWRlcHV1Lm1vbnRyYWNrLmVudGl0eS5Sb2xlQDQ4NThkMTMwIn0.sBBglnsixD6q6mchOrJapi0IUTJnPZUWw84K6irmD0EN-edO0s2wfFHk3dyddWk2TXTgc8ZfeQbn_NUm79ETx2XKIcSYQL3Ynrb30ROweuYCVhZPKDVrZAR4Rzt79LO0OTTJXNnDZIpF1ONQmH3SadzgMCiSi0Edx_kUJYoznO1Ypj7d9NQgp-Iu2JvTLfdM3kgnnrkrf7IUD4ZiBIQwkQi35cE5Ecp4FEUrL4UmCgx_wPiQVrtuwn4YnCR0M_3zDhUiVEMjRLzngMyrdUjpSPuINyCyXj02t92Lm6e9GoCDjtMTkjlCw4FCLY7CCswsjIeYFNuRfryrkUy0YrQU4A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}users",
+							"host": [
+								"{{base_url}}users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User BY ID",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Create New User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"mociee@mail.com\",\r\n    \"password\": \"miaw1234\",\r\n    \"pin\": \"1234\",\r\n    \"profilePictureUrl\": \"http://placehold.co/500x500\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}users/register",
+							"host": [
+								"{{base_url}}users"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New User BULK",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"users\": [\r\n        {\r\n            \"email\": \"totally.unique.email@mail.com\",\r\n            \"password\": \"hehefufu\",\r\n            \"pin\": \"12312344\",\r\n            \"profilePictureUrl\": \"http://placehold.co/500x500\"\r\n        },\r\n        {\r\n            \"email\": \"muhammad.sumbul4@mail.com\",\r\n            \"password\": \"fafa\",\r\n            \"pin\": \"124241\",\r\n            \"profilePictureUrl\": \"http://placehold.co/500x500\"\r\n        },\r\n        {\r\n            \"email\": \"muhammad.sumbul2@mail.com\",\r\n            \"password\": \"miaww\",\r\n            \"pin\": \"12344\",\r\n            \"profilePictureUrl\": \"http://placehold.co/500x500\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}users/bulk",
+							"host": [
+								"{{base_url}}users"
+							],
+							"path": [
+								"bulk"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"mociee@mail.com\",\r\n    \"password\": \"miaw1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}auth/login",
+							"host": [
+								"{{base_url}}auth"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

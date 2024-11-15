@@ -1,13 +1,17 @@
 package com.adepuu.montrack.infrastructure.users.controller;
 
 import com.adepuu.montrack.common.response.ApiResponse;
+import com.adepuu.montrack.infrastructure.security.Claims;
 import com.adepuu.montrack.infrastructure.users.dto.BulkCreateUserRequestDTO;
 import com.adepuu.montrack.infrastructure.users.dto.CreateUserRequestDTO;
 import com.adepuu.montrack.usecase.user.CreateUserUsecase;
 import com.adepuu.montrack.usecase.user.GetUsersUseCase;
+import lombok.extern.java.Log;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+@Log
 @RestController
 @RequestMapping("/api/v1/users")
 public class UsersPublicController {
@@ -19,8 +23,12 @@ public class UsersPublicController {
     this.createUserUsecase = createUserUsecase;
   }
 
+  //  Simple RBAC where only logged in admins are allowed to access get all users endpoint
+  @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
   @GetMapping
   public ResponseEntity<?> getUsers() {
+    String email = Claims.getEmailFromJwt();
+    log.info("Requester email is: " + email);
     return ApiResponse.successfulResponse("Get all users success", getUsersUseCase.getAllUsers());
   }
 
@@ -29,9 +37,10 @@ public class UsersPublicController {
     return ApiResponse.successfulResponse("Get user details success", getUsersUseCase.getUserById(id));
   }
 
-  @PostMapping
+  @PostMapping("/register")
   public ResponseEntity<?> createUser(@RequestBody CreateUserRequestDTO req) {
-    return ApiResponse.successfulResponse("Create new user success", createUserUsecase.createUser(req));
+    var result = createUserUsecase.createUser(req);
+    return ApiResponse.successfulResponse("Create new user success", result);
   }
 
   @PostMapping("/bulk")
