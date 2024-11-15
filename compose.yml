@@ -1,13 +1,13 @@
 services:
-  backend-app:
-    container_name: backend-app
-    build:
-      context: .
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-    ports:
-      - 8080:8080
+#  backend-app:
+#    container_name: backend-app
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    env_file:
+#      - .env
+#    ports:
+#      - 8080:8080
   postgres:
     container_name: main-db
     image: postgres:alpine

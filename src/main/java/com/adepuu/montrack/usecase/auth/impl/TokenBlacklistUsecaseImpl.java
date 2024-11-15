@@ -10,6 +10,7 @@ import java.time.Duration;
 
 @Service
 public class TokenBlacklistUsecaseImpl implements TokenBlacklistUsecase {
+    private final String REDIS_BLACKLIST_KEY = "montrack_blacklist_token:";
     private final RedisTokenRepository redisTokenRepository;
 
     public TokenBlacklistUsecaseImpl(RedisTokenRepository redisTokenRepository) {
@@ -19,11 +20,11 @@ public class TokenBlacklistUsecaseImpl implements TokenBlacklistUsecase {
     @Override
     public void blacklistToken(String token, String expiredAt) {
         Duration duration = Duration.between(java.time.Instant.now(), java.time.Instant.parse(expiredAt));
-        redisTokenRepository.saveToken(token, duration);
+        redisTokenRepository.saveToken(REDIS_BLACKLIST_KEY + token, duration);
     }
 
     @Override
     public boolean isTokenBlacklisted(String token) {
-        return redisTokenRepository.isTokenBlacklisted(token);
+        return redisTokenRepository.isTokenBlacklisted(REDIS_BLACKLIST_KEY + token);
     }
 }

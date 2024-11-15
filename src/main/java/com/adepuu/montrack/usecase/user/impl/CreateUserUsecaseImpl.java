@@ -4,10 +4,12 @@ import com.adepuu.montrack.entity.Role;
 import com.adepuu.montrack.entity.User;
 import com.adepuu.montrack.infrastructure.users.dto.BulkCreateUserRequestDTO;
 import com.adepuu.montrack.infrastructure.users.dto.CreateUserRequestDTO;
+import com.adepuu.montrack.infrastructure.users.dto.UserDetailResponseDTO;
 import com.adepuu.montrack.infrastructure.users.repository.RoleRepository;
 import com.adepuu.montrack.infrastructure.users.repository.UsersRepository;
 import com.adepuu.montrack.usecase.user.CreateUserUsecase;
 import lombok.extern.java.Log;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +31,8 @@ public class CreateUserUsecaseImpl implements CreateUserUsecase {
   }
 
   @Override
-  public User createUser(CreateUserRequestDTO req){
+  @CachePut(value = "userDetailResponseDTO", key = "#result.id", unless = "#result.isOnboardingFinished == true")
+  public UserDetailResponseDTO createUser(CreateUserRequestDTO req){
     User newUser = req.toEntity();
     newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
 
@@ -39,7 +42,8 @@ public class CreateUserUsecaseImpl implements CreateUserUsecase {
     } else {
       throw new RuntimeException("Default role not found");
     }
-    return usersRepository.save(newUser);
+    var savedUser = usersRepository.save(newUser);
+    return new UserDetailResponseDTO(savedUser.getId(), savedUser.getEmail(), savedUser.getProfilePictureUrl(), savedUser.getIsOnboardingFinished());
   }
 
   @Override
